@@ -54,7 +54,7 @@ else
     original="http://$K8S_API_ENDPOINT/api/v1/proxy/namespaces/$ns/services/$svc:$target_port/"
     echo "starting proxying $original to 0.0.0.0:$expose_port"
     container_name="${ns}_${svc}_${target_port}"
-    rm_container=`docker rm $container_name`
+    docker rm $container_name 2> /dev/null
     docker run -it \
            --name "$container_name" \
            -p $expose_port:80 \
