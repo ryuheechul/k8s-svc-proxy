@@ -58,7 +58,9 @@ else
     docker run -it \
            --name "$container_name" \
            -p $expose_port:80 \
-           -e "KUBE_SERVICE=$svc" -e "KUBE_NAMESPACE=$ns" -e "KUBE_TARGET_PORT=$target_port" \
+           -e "KUBE_SERVICE=$svc" -e "KUBE_NAMESPACE=$ns" \
+           -e "KUBE_TARGET_PORT=$target_port" \
+           -e "KUBE_EXPOSE_PORT=$expose_port" \
            -e "KUBE_API_ENDPOINT=$K8S_API_ENDPOINT" \
            -v `pwd`/nginx-template.conf:/nginx-template.conf \
            -v `pwd`/bin/boot-nginx.sh:/boot-nginx.sh \
