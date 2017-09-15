@@ -44,7 +44,7 @@ tokenize $@
 tokenizeResult=$?
 
 if [ -z "$K8S_API_ENDPOINT" ]; then # must have 2 args
-    echo "please provide \$K8S_API_ENDPOINT!"
+    echo "please provide \$K8S_API_ENDPOINT! by 'export K8S_API_ENDPOINT=your.endpoint'"
     exit 1
 elif [ $verifyResult -ne 0 ]; then # must have 2 args
     exit 1
@@ -54,6 +54,14 @@ else
     original="http://$K8S_API_ENDPOINT/api/v1/proxy/namespaces/$ns/services/$svc:$target_port/"
     echo "starting proxying $original to 0.0.0.0:$expose_port"
     container_name="${ns}_${svc}_${target_port}"
+
+    template_src="nginx-template.conf"
+
+    if [ ! -z $KSP_VERBOSE_PATH ]; then
+        template_src="nginx-verbose-path-template.conf"
+        echo "using verbose path mode!"
+    fi
+
     docker rm $container_name 2> /dev/null
     docker run -it \
            --name "$container_name" \
@@ -62,7 +70,7 @@ else
            -e "KUBE_TARGET_PORT=$target_port" \
            -e "KUBE_EXPOSE_PORT=$expose_port" \
            -e "KUBE_API_ENDPOINT=$K8S_API_ENDPOINT" \
-           -v `pwd`/nginx-template.conf:/nginx-template.conf \
+           -v `pwd`/$template_src:/nginx-template.conf \
            -v `pwd`/bin/boot-nginx.sh:/boot-nginx.sh \
            nginx:latest /boot-nginx.sh
 fi
